@@ -11,8 +11,7 @@ An example of JWT  for Koa2
 
 以上表格只是表达url和token的对应关系，其他数据不在该表格表达范围之内。
 
-
-
+接下来的优化待更新中
 
 
 

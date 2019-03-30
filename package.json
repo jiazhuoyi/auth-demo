@@ -20,8 +20,11 @@
     "koa-logger": "^3.2.0",
     "koa-onerror": "^4.1.0",
     "koa-router": "^7.4.0",
+    "koa2-cors": "^2.0.6",
     "log4js": "^2.11.0",
+    "mockjs": "^1.0.1-beta3",
     "mongoose": "^5.2.9",
+    "qiniu": "^7.2.1",
     "raw-body": "^2.3.3",
     "sha1": "^1.1.1",
     "xml2js": "^0.4.19"

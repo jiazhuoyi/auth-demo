@@ -7,6 +7,7 @@ const bodyparser = require('koa-bodyparser');
 const debug = require('debug')('demo:server');
 const logger = require('koa-logger')
 const koajwt = require('koa-jwt');
+const cors = require('koa2-cors');
 
 const config = require('./config');
 const logUtil = require('./utils/log_util');
@@ -21,6 +22,34 @@ app.use(bodyparser({
 
 app.use(json());
 app.use(logger());
+
+// app.use(cors({
+//   origin: (ctx) => {
+//     console.log('---------url:', ctx.url);
+//     if(cxt.url === 'login') {
+//       return '*';
+//     }
+//     return 'http://localhost:8081';
+//   },
+//   exposeHeaders: ['WWW-Authenticate', 'Server-Authorization'],
+//   maxAge: 5,
+//   credentials: true
+//   // allowHeaders: ['Content-Type', 'Authorization', 'Accept']
+// }))
+app.use(cors({
+  origin: function(ctx) {
+    console.log('url:', ctx.url);
+    if (ctx.url === '/test') {
+      return false;
+    }
+    return '*';
+  },
+  exposeHeaders: ['WWW-Authenticate', 'Server-Authorization'],
+  maxAge: 300,
+  credentials: true,
+  allowMethods: ['GET', 'POST', 'DELETE'],
+  allowHeaders: ['Content-Type', 'Authorization', 'Accept'],
+}));
 
 app.use(async (ctx, next) => {
     const start = new Date()
@@ -38,7 +67,9 @@ app.use(async (ctx, next) => {
 });
 
 app.use((ctx, next) => {
+  console.log('-----------ctx----------');
   return next().catch((err) => {
+    console.log('#################err:', err);
     if(err.status === 401) {
       ctx.status = 401;
       ctx.body = 'use Authorization header to get access';
@@ -50,7 +81,7 @@ app.use((ctx, next) => {
 app.use(koajwt({
   secret: 'my_token'
 }).unless({
-  path: [/\/api\/v1\/login/, /\/api\/v1\/signup/]
+  path: [/\/api\/v1\/login/, /\/api\/v1\/signup/, /\/api\/v1\/qiniu-token/]
 }));
 
 const checkToken = require('./lib/middleware/check-token');

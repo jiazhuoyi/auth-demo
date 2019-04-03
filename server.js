@@ -8,11 +8,15 @@ const debug = require('debug')('demo:server');
 const logger = require('koa-logger')
 const koajwt = require('koa-jwt');
 const cors = require('koa2-cors');
+const socket = require('socket.io');
+const os = require('os');
 
 const config = require('./config');
 const logUtil = require('./utils/log_util');
 
 require('./lib/config/mongoose-client');
+require('./lib/config/redis').connectRedis(config.redis);
+require('./lib/utils/task').subTask();
 
 const Api = require('./lib/routes/route');
 
@@ -95,6 +99,32 @@ server.listen(config.port);
 server.on('error', onError);
 server.on('listening', onListening);
 
+const io = socket(server);
+io.on('connection', function(socket) {
+  console.log('socket.io初始化成功...');
+  socket.on('receive', data => {
+    console.log('监听到了消息,内容为:', data);
+    const freemem = os.freemem();
+    const totalmem = os.totalmem();
+    const memory = 
+    socket.emit('getData', {
+      msg: data,
+      status: 200,
+      data: {
+        freemem,
+        hostname: os.hostname(),
+        platform: os.platform(),
+        totalmem,
+        memory: parseInt((totalmem - freemem) / totalmem *100),
+        cpus: os.cpus()
+      }
+    });
+  })
+
+});
+
+
+require('./lib/utils/task');
 function onError(error) {
     if (error.syscall !== 'listen') {
       throw error;

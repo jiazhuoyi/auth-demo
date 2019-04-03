@@ -4,5 +4,10 @@ module.exports = {
         port: 27017,
         db: 'test'
     },
-    port: 3000
+    port: 3000,
+    redis: {
+        host: 'localhost',
+        port: '6379',
+        db: 8
+    }
 };
